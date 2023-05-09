@@ -1,12 +1,16 @@
 
 #include <ESP32Servo.h>
 
+#define PIN_NECK_BASE 21
+#define PIN_NECK_SPHERE_A 22
+#define PIN_NECK_SPHERE_B 23
+
 Servo servo_1, servo_2, servo_3;
 
 void setup() {
-	servo_3.attach(12);  // attaches the servo on ESP32 pin
-	servo_1.attach(14);  // attaches the servo on ESP32 pin
-	servo_2.attach(27);  // attaches the servo on ESP32 pin
+	servo_3.attach(PIN_NECK_BASE);  // attaches the servo on ESP32 pin
+	servo_1.attach(PIN_NECK_SPHERE_A);  // attaches the servo on ESP32 pin
+	servo_2.attach(PIN_NECK_SPHERE_B);  // attaches the servo on ESP32 pin
 
 	servo_1.write(110); // servo for spherical joint 1 = pitch angle x axis
 	servo_2.write(55); // servo for spherical joint 2 = roll angle y axis 
