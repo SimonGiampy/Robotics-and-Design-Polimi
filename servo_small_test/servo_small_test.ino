@@ -11,29 +11,32 @@
 Servo servo_left, servo_right;
 
 void setup() {
-	servo_left.attach(12);  // attaches the servo on ESP32 pin
-	servo_right.attach(14);  // attaches the servo on ESP32 pin
+	servo_left.attach(19);  // attaches the servo on ESP32 pin
+	servo_right.attach(18);  // attaches the servo on ESP32 pin
+
+	// right servo motor goes from standing position at 150 degrees down to 80 degrees (pulling position)
+	// left servo motor goes from standing position at 80 degrees up to 150 degrees (pulling position)
 	
-	servo_left.write(90);
-	servo_right.write(90);
+	servo_left.write(100);
+	servo_right.write(100);
 	delay(1000);
 }
 
 
 void loop() {
 	
-	for (int i = 0; i < 40; i++) {
+	for (int i = 80; i < 150; i++) {
 		servo_left.write(i);
-		delay(40);
+		delay(30);
 	}
 
-	delay(1000);
+	//delay(1000);
 	
-	for (int i = 80; i < 180; i++) {
+	for (int i = 150; i > 80; i--) {
 		servo_right.write(i);
-		delay(40);
+		delay(30);
 	}
 
-	delay(1000);
+	//delay(1000);
 	
 }
