@@ -22,19 +22,19 @@ TaskHandle_t Task1;
 TaskHandle_t Task2;
 
 void setup() {
-  // put your setup code here, to run once:
-  Serial.begin(115200);
-  delay(10);
-  Serial.println();
+	// put your setup code here, to run once:
+	Serial.begin(115200);
+	delay(10);
+	Serial.println();
 
-  // Create a task that will be executed in the main_loop() function,
-  // with name "main", stack size 10000, NULL as parameter, priority 1,
-  // handled by Task1 and executed on core 0
-  xTaskCreatePinnedToCore(main_loop, "main", 10000, NULL, 1, &Task1, 0);
-  delay(500);
+	// Create a task that will be executed in the main_loop() function,
+	// with name "main", stack size 10000, NULL as parameter, priority 1,
+	// handled by Task1 and executed on core 0
+	xTaskCreatePinnedToCore(main_loop, "main", 10000, NULL, 1, &Task1, 0);
+	delay(500);
 
-  xTaskCreatePinnedToCore(network_loop, "network", 10000, NULL, 1, &Task2, 1);
-  delay(500);
+	xTaskCreatePinnedToCore(network_loop, "network", 10000, NULL, 1, &Task2, 1);
+	delay(500);
 }
 
 void main_loop(void* pvParameters) {
