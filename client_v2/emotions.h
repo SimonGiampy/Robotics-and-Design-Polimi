@@ -3,6 +3,8 @@
 #include <Arduino.h>
 #include <WiFi.h>
 #include <WiFiClient.h>
+#include <DFRobotDFPlayerMini.h>
+#include <HardwareSerial.h>
 
 // initializations
 void initConnection();
@@ -11,11 +13,11 @@ void initEyebrows();
 void initMouth();
 void initNeck();
 void initEyes();
+void initSpeaker();
+void setMouthColor(uint8_t R, uint8_t G, uint8_t B);
 
 // handling messages and data
 void handle(String incomingData);
-void network_loop(void* pvParameters);
-void setMouthColor(uint8_t R, uint8_t G, uint8_t B);
 
 //Task Functions
 void main_loop(void* pvParameters);
@@ -74,6 +76,14 @@ Servo rightEarServo;
 Servo leftEyebrowServo;
 Servo rightEyebrowServo;
 // --- END EYEBROWS ---
+
+// --- START SPEAKER ---
+HardwareSerial mySoftwareSerial(1); // serial communication with speaker
+DFRobotDFPlayerMini myDFPlayer; // mp3 player object
+
+#define PIN_Tx 5
+#define PIN_Rx 15
+// --- END SPEAKER ---
 
 // definition of the structure for animating the robot
 typedef struct {

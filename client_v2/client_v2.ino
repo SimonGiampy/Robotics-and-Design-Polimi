@@ -34,6 +34,13 @@ char currentEmotion = 'i';
 void emote(MovementStruct movements, uint8_t eyes_animation[][2][16]);
 // emote functions list
 void emote_relaxed();
+void emote_happy();
+void emote_sad();
+void emote_angry();
+void emote_surprised();
+void emote_afraid();
+void emote_annoyed();
+void emote_anxious();
 
 
 
@@ -90,6 +97,49 @@ void initEyes(){
 	}
 }
 
+// RXD2 pin = GPIO 15
+// TXD2 pin = GPIO 5
+
+// wirings:
+// https://github.com/NicolasBrondin/flower-player/raw/master/schema.jpg
+// tx pin mp3 -> gpio 5 esp32
+// rx pin mp3 -> gpio 15 esp32
+// from left to right, with mp3 player sd card side on the left, on the top:
+// spk2 mp3 -> speaker negative
+// gnd mp3 -> gnd
+// spk1 mp3 -> speaker positive
+// skip x2 pins
+// tx mp3
+// rx mp3
+// vcc mp3
+
+void initSpeaker() {
+	mySoftwareSerial.begin(9600, SERIAL_8N1, PIN_Tx, PIN_Rx);  // speed, type, TX, RX
+
+	Serial.println();
+	Serial.println("Initializing DFPlayer");
+	
+	while(!myDFPlayer.begin(mySoftwareSerial)) {
+		Serial.println("Unable to begin");
+	}
+	Serial.println("DFPlayer Mini online.");
+
+	songsCount = myDFPlayer.readFileCountsInFolder(2);
+	myDFPlayer.volume(20);
+	myDFPlayer.EQ(DFPLAYER_EQ_NORMAL);
+	myDFPlayer.outputDevice(DFPLAYER_DEVICE_SD);
+	myDFPlayer.playFolder(1, 1);  
+	myDFPlayer.start();
+
+	/*
+	if (myDFPlayer.available()) {
+		uint8_t type = myDFPlayer.readType();
+		if(type == DFPlayerPlayFinished){
+			myDFPlayer.playFolder(1, 1);  
+		}
+	}
+	*/
+}
 
 
 void handle(String incomingData) {
@@ -100,61 +150,58 @@ void handle(String incomingData) {
 		if (incomingData.indexOf("mx") == 0) { // motor x axis
 			angle = incomingData.substring(2, 5).toInt();
 			neckSphereX.write(angle);
-		} else if (incomingData.indexOf("my") == 0) {
+		} else if (incomingData.indexOf("my") == 0) { // motor y axis
 			angle = incomingData.substring(2, 5).toInt();
 			neckSphereY.write(angle);
-		} else if (incomingData.indexOf("mz") == 0) {
+		} else if (incomingData.indexOf("mz") == 0) { // motor z axis
 			angle = incomingData.substring(2, 5).toInt();
 			neckBaseZ.write(angle);
 		}
 		
 	} else if (incomingData.indexOf("happy_") == 0) {
-		
+		emote_happy();
 	} else if (incomingData.indexOf("angry_") == 0) {
-		
+		emote_angry();
 	} else if (incomingData.indexOf("anxious_") == 0) {
-		
+		emote_anxious();
 	} else if (incomingData.indexOf("sad_") == 0) {
-		
+		emote_idle();
 	} else if (incomingData.indexOf("relaxed_") == 0) {
 		emote_relaxed();
 	} else if (incomingData.indexOf("surprised_") == 0) {
-
+		emote_surprised();
 	} else if (incomingData.indexOf("afraid_") == 0) {
-		
+		emote_afraid();
 	} else if (incomingData.compareTo("idle_") == 0) {
 		emote_idle();
-	
-	} else if (incomingData.compareTo("G0") == 0) {
-
 	} else if (incomingData.compareTo("G1") == 0) { // Rocco message
-		emote_relaxed();
+		lookAt(1);
 	} else if (incomingData.compareTo("G2") == 0) { // Rocco message
-		
+		lookAt(1);
 	} else if (incomingData.compareTo("G3") == 0) { // Eva message
 		
 	} else if (incomingData.compareTo("G4") == 0) { // Eva message
 		
 	} else if (incomingData.compareTo("G5") == 0) { // Lele message
-		
+		lookAt(3);
 	} else if (incomingData.compareTo("G6") == 0) { // Lele message
-		
+		lookAt(3);
 	} else if (incomingData.compareTo("G7") == 0) { // Carlotta Message
-		
+		lookAt(4);
 	} else if (incomingData.compareTo("G8") == 0) { // Carlotta Message
-		
+		lookAt(4);
 	} else if (incomingData.compareTo("G9") == 0) {	// Peppe message
-		
+		lookAt(5);
 	} else if (incomingData.compareTo("GA") == 0) { // Peppe message
-		
+		lookAt(5);
 	} else if (incomingData.compareTo("GB") == 0) { // Bianca message
-		
+		lookAt(6);
 	} else if (incomingData.compareTo("GC") == 0) { // Bianca message
-		
+		lookAt(6);
 	} else if (incomingData.compareTo("GD") == 0) { // Cosimo message
-		
+		lookAt(7);	
 	} else if (incomingData.compareTo("GE") == 0) { // Cosimo message
-		
+		lookAt(7);
 	} else if (incomingData.compareTo("GF") == 0) {
 		//god kills any sequence of reactions
 		//set flag to prevent any reaction and clear the queue of reactions
@@ -259,11 +306,12 @@ void setup() {
 	initEars();
 	initEyebrows();
 	initNeck();
-	initEyes();                  
+	initEyes();
+	initSpeaker();
 	delay(500);
 
 	//Wifi and Server Init
-	//initConnection();
+	initConnection();
 
 	//Parallel functions
 
@@ -356,3 +404,33 @@ void emote_relaxed() {
 void emote_idle() {
 	emote(idleMovements, relaxed);
 }
+
+void emote_happy() {
+	emote(happyMovements, happy);
+}
+
+void emote_sad() {
+	emote(sadMovements, sad);
+}
+
+void emote_angry() {
+	emote(angryMovements, angry);
+}
+
+void emote_surprised() {
+	emote(surprisedMovements, surprised);
+}
+
+void emote_annoyed() {
+	emote(annoyedMovements, annoyed);
+}
+
+void emote_anxious() {
+	emote(anxiousMovements, anxious);
+}
+
+void emote_afraid() {
+	emote(afraidMovements, afraid);
+}
+
+
