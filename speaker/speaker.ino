@@ -1,5 +1,5 @@
-// RXD2 pin = GPIO 16
-// TXD2 pin = GPIO 17
+// RXD2 pin = GPIO 15
+// TXD2 pin = GPIO 5
 
 // wirings:
 // https://github.com/NicolasBrondin/flower-player/raw/master/schema.jpg
