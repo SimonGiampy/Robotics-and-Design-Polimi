@@ -5,6 +5,9 @@
 #include <WiFiClient.h>
 #include <DFRobotDFPlayerMini.h>
 #include <HardwareSerial.h>
+#include <vector>
+#include <deque>
+#include <string>
 
 // initializations
 void initConnection();
@@ -17,7 +20,7 @@ void initSpeaker();
 void setMouthColor(uint8_t R, uint8_t G, uint8_t B);
 
 // handling messages and data
-void handle(String incomingData);
+void handle(std::string incomingData);
 
 //Task Functions
 void main_loop(void* pvParameters);
@@ -49,8 +52,8 @@ MD_MAX72XX rightEye = MD_MAX72XX(LED_MATRIX_TYPE, PIN_RIGHT_EYE_DATA, PIN_RIGHT_
 #define PIN_NECK_SPHERE_X 22
 #define PIN_NECK_SPHERE_Y 23
 #define NECK_BASE_START_POS 90 // rotates left to 0 degrees, right to 180 degrees
-#define NECK_SPHERE_X_START_POS 70 // tilt upwards down to 0 degrees, downwards up to 130 degrees
-#define NECK_SPHERE_Y_START_POS 55 // tilt left down to 0 degrees, right up to 110 degrees
+#define NECK_SPHERE_X_START_POS 75 // tilt upwards down to 20 degrees (for simmetry), downwards up to 130 degrees
+#define NECK_SPHERE_Y_START_POS 35 // tilt left down to 0 degrees (strange problem), right up to 70 (for simmetry) degrees
 
 Servo neckBaseZ;
 Servo neckSphereX;
@@ -126,13 +129,13 @@ MovementStruct relaxedMovements = {
 
 // basic animation for demo purpose
 MovementStruct idleMovements = {
-	.maxFrames = 60,
+	.maxFrames = 1,
 	.neckBaseFrames = 1,
 	.neckBaseAngles = {90},
 	.neckSphereXFrames = 1,
 	.neckSphereXAngles = {75},
 	.neckSphereYFrames = 1,
-	.neckSphereYAngles = {55},
+	.neckSphereYAngles = {35},
 	.leftEarFrames = 1,
 	.leftEarAngles = {80},
 	.rightEarFrames = 1,
@@ -143,8 +146,9 @@ MovementStruct idleMovements = {
 	.rightEyebrowAngles = {90}
 };
 
+
 // basic emotion for being calm
-uint8_t relaxed[][2][16] = {
+std::vector<std::vector<std::vector<unsigned int>>> idle = {
 	{{0x0, 0x0, 0x7E, 0xFF, 0xFF, 0xFF, 0xE1, 0xE1, 0xE1, 0xE1, 0xFF, 0xFF, 0xFF, 0x7E, 0x0, 0x0},{0x0, 0x0, 0x7E, 0xFF, 0xFF, 0xFF, 0xE1, 0xE1, 0xE1, 0xE1, 0xFF, 0xFF, 0xFF, 0x7E, 0x0, 0x0}},
 	{{0x0, 0x0, 0x7E, 0xFF, 0xFF, 0xFF, 0xE1, 0xE1, 0xE1, 0xE1, 0xFF, 0xFF, 0xFF, 0x7E, 0x0, 0x0},{0x0, 0x0, 0x7E, 0xFF, 0xFF, 0xFF, 0xE1, 0xE1, 0xE1, 0xE1, 0xFF, 0xFF, 0xFF, 0x7E, 0x0, 0x0}},
 	{{0x0, 0x0, 0x3C, 0x7E, 0x7E, 0x7E, 0x62, 0x62, 0x62, 0x62, 0x7E, 0x7E, 0x7E, 0x3C, 0x0, 0x0},{0x0, 0x0, 0x3C, 0x7E, 0x7E, 0x7E, 0x62, 0x62, 0x62, 0x62, 0x7E, 0x7E, 0x7E, 0x3C, 0x0, 0x0}},
