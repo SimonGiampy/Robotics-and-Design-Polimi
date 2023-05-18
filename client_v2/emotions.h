@@ -1,10 +1,11 @@
-#include <MD_MAX72xx.h>
+#include <MD_MAX72xx.h> // led matrices libraries
 #include <ESP32Servo.h>
 #include <Arduino.h>
 #include <WiFi.h>
 #include <WiFiClient.h>
-#include <DFRobotDFPlayerMini.h>
-#include <HardwareSerial.h>
+#include <DFRobotDFPlayerMini.h> // mp3 player library
+#include <HardwareSerial.h> // communication with mp3 player
+// standard cpp libraries
 #include <vector>
 #include <deque>
 #include <string>
@@ -129,7 +130,7 @@ MovementStruct relaxedMovements = {
 
 // basic animation for demo purpose
 MovementStruct idleMovements = {
-	.maxFrames = 1,
+	.maxFrames = 60,
 	.neckBaseFrames = 1,
 	.neckBaseAngles = {90},
 	.neckSphereXFrames = 1,
@@ -137,7 +138,7 @@ MovementStruct idleMovements = {
 	.neckSphereYFrames = 1,
 	.neckSphereYAngles = {35},
 	.leftEarFrames = 1,
-	.leftEarAngles = {80},
+	.leftEarAngles = {90},
 	.rightEarFrames = 1,
 	.rightEarAngles = {150},
 	.leftEyebrowFrames = 1,

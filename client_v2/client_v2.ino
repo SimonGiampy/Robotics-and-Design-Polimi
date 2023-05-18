@@ -15,9 +15,9 @@ const char* password_test = "test1234567!";
 const char* server_ip_test = "192.168.1.5";
 int server_port_test = 800;
 
-const char* ssid = "192.168.56.1";
-const char* password = "test1234567!";
-const char* server_ip = "192.168.1.3";
+const char* ssid = "Doki Doki Literature Club";
+const char* password = "SimonGiampy";
+const char* server_ip = "192.168.90.244";
 int server_port = 800;
 
 static WiFiClient client;
@@ -96,22 +96,6 @@ void initEyes(){
 	}
 }
 
-// RXD2 pin = GPIO 15
-// TXD2 pin = GPIO 5
-
-// wirings:
-// https://github.com/NicolasBrondin/flower-player/raw/master/schema.jpg
-// tx pin mp3 -> gpio 5 esp32
-// rx pin mp3 -> gpio 15 esp32
-// from left to right, with mp3 player sd card side on the left, on the top:
-// spk2 mp3 -> speaker negative
-// gnd mp3 -> gnd
-// spk1 mp3 -> speaker positive
-// skip x2 pins
-// tx mp3
-// rx mp3
-// vcc mp3
-
 void initSpeaker() {
 	mySoftwareSerial.begin(9600, SERIAL_8N1, PIN_Tx, PIN_Rx);  // speed, type, TX, RX
 
@@ -123,21 +107,22 @@ void initSpeaker() {
 	}
 	Serial.println("DFPlayer Mini online.");
 
-	//songsCount = myDFPlayer.readFileCountsInFolder(2);
-	myDFPlayer.volume(5);
+	int mp3Count = myDFPlayer.readFileCounts();
+	Serial.print("mp3 files count: " + String(mp3Count));
+	myDFPlayer.volume(20);
 	myDFPlayer.EQ(DFPLAYER_EQ_NORMAL);
 	myDFPlayer.outputDevice(DFPLAYER_DEVICE_SD);
-	myDFPlayer.playFolder(1, 1);  
-	//myDFPlayer.start();
 
-	/*
-	if (myDFPlayer.available()) {
-		uint8_t type = myDFPlayer.readType();
-		if(type == DFPlayerPlayFinished){
-			myDFPlayer.playFolder(1, 1);  
-		}
-	}
-	*/
+	// audio file names
+	// 1.mp3 -> tts message G4
+	// 2.mp3 -> tts message G3
+	// 3.mp3 -> angry
+	// 4.mp3 -> happy
+	// 5.mp3 -> sad
+	// 6.mp3 -> surprised
+	// 7.mp3 -> annoyed
+	// 8.mp3 -> anxious
+	// 9.mp3 -> idle
 }
 
 
@@ -179,6 +164,9 @@ void loop() {
 			incomingData = std::string(messages.back());
 			messages.pop_back();
 			handle(incomingData);
+		} else {
+			// no message, go to idle
+			emote_idle();
 		}
 		//delay(10);
 	}
@@ -205,12 +193,47 @@ void network_loop(void* pvParameters) {
 			}
 			// add to queue
 			messages.push_front(incomingData);
-			handle(incomingData);
 		}
-
-		//delay(10);
   }
 }
+
+
+void initConnection() {
+
+	Serial.println();
+	Serial.print("Connecting to ");
+	Serial.println(ssid);
+
+	// WiFi connection
+	WiFi.begin(ssid, password);
+
+	while (WiFi.status() != WL_CONNECTED) {
+		//delay(100);
+		// use millis() function to wait for 100ms
+		unsigned long time_now = millis();
+		while (millis() - time_now < 100) {
+			// do nothing
+		}
+		
+	}
+	Serial.println();
+	Serial.println("WiFi connected");
+	Serial.println("IP address: ");
+	Serial.println(WiFi.localIP());
+
+	// Server connection
+	Serial.println();
+	Serial.println("Connecting to Server...");
+	while (!client.connect(server_ip, server_port)) {
+		unsigned long time_now = millis();
+		while (millis() - time_now < 100) {
+			// do nothing
+		}
+	}
+	Serial.println("Server connected");
+	Serial.println();
+}
+
 
 
 void handle(std::string incomingData) {
@@ -229,18 +252,29 @@ void handle(std::string incomingData) {
 			angle = std::stoi(incomingData.substr(2, 3));
 			neckBaseZ.write(angle);
 		}
-		
+		unsigned long time_now = millis();
+		while (millis() - time_now < 3000) {
+			// do nothing
+		}
+	} else if (incomingData.substr(0, 4) == "play") { // play audio file
+		myDFPlayer.play(std::stoi(incomingData.substr(4, 1)));
 	} else if (incomingData == "happy_") {
+		myDFPlayer.play(4);
 		emote_happy();
 	} else if (incomingData == "angry_") {
+		myDFPlayer.play(3);
 		emote_angry();
 	} else if (incomingData == "anxious_") {
+		myDFPlayer.play(8);
 		emote_anxious();
 	} else if (incomingData == "sad_") {
+		myDFPlayer.play(7);
 		emote_sad();
 	} else if (incomingData == "surprised_") {
+		myDFPlayer.play(6);
 		emote_surprised();
 	} else if (incomingData == "idle_") {
+		myDFPlayer.play(5);
 		emote_idle();
 	} else if (incomingData == "G1") { // Rocco message
 		lookAt(1);
@@ -249,15 +283,31 @@ void handle(std::string incomingData) {
 		lookAt(1);
 		god_message = "G2";
 	} else if (incomingData == "G3") { // Eva message
+		god_message = "G3";
 		// read tts message with audio
-		// send message to server with GG
+		myDFPlayer.play(2);
+		// send message to server with GG after audio is finished playing
+		while (myDFPlayer.readState() != 0) {
+			// spin wait
+		}
+		client.println("GG");
 		// send message with reaction
-		// emote emotion annoyed
+		client.println("2L13");
+		// emote emotion anxoious
+		emote_anxious();
 	} else if (incomingData == "G4") { // Eva message
+		god_message = "G4";
 		// read tts message with audio
-		// send message to server with GG
+		myDFPlayer.play(1);
+		// send message to server with GG after audio is finished playing
+		while (myDFPlayer.readState() != 0) {
+			// spin wait
+		}
+		client.println("GG");
 		// send message with reaction
+		client.println("2C13");
 		// emote emotion angry
+		emote_angry();
 	} else if (incomingData == "G5") { // Lele message
 		lookAt(3);
 		god_message = "G5";
@@ -288,6 +338,11 @@ void handle(std::string incomingData) {
 	} else if (incomingData == "GE") { // Cosimo message
 		lookAt(7);
 		god_message = "GE";
+	} else if (incomingData == "GF") { // God kills
+		// set messages deque to empty
+		messages.clear();
+		kill_signal = false;
+		emote_idle();
 	} else if (incomingData == "GG") { // react to the God messages
 		if (god_message == "G1") {
 			emote_happy();
@@ -398,59 +453,8 @@ void handle(std::string incomingData) {
 		//client.flush(); // ?
 		
 	}
+	//emote_idle(); // after emotion finishes, go back to idle
 
-}
-/*
-void main_loop(void* pvParameters) {
-	// Handle emotions
-	while (true) {
-		//Read from serial interface to bypass WiFi for debugging
-		if (Serial.available()) {
-			incomingData = Serial.readStringUntil('\n');
-			Serial.println("Serial data = " + incomingData);
-			handle(incomingData);
-		}
-		delay(10);
-	}
-}
-*/
-
-
-
-void initConnection() {
-
-	Serial.println();
-	Serial.print("Connecting to ");
-	Serial.println(ssid_test);
-
-	// WiFi connection
-	WiFi.begin(ssid_test, password_test);
-
-	while (WiFi.status() != WL_CONNECTED) {
-		//delay(100);
-		// use millis() function to wait for 100ms
-		unsigned long time_now = millis();
-		while (millis() - time_now < 100) {
-			// do nothing
-		}
-		
-	}
-	Serial.println();
-	Serial.println("WiFi connected");
-	Serial.println("IP address: ");
-	Serial.println(WiFi.localIP());
-
-	// Server connection
-	Serial.println();
-	Serial.println("Connecting to Server...");
-	while (!client.connect(server_ip_test, server_port_test)) {
-		unsigned long time_now = millis();
-		while (millis() - time_now < 100) {
-			// do nothing
-		}
-	}
-	Serial.println("Server connected");
-	Serial.println();
 }
 
 
@@ -461,13 +465,13 @@ void lookAt(int robotNumber) {
 	} else if (robotNumber == 3) {
 		neckBaseZ.write(0); // robot sits on its right
 	} else if (robotNumber == 4) {
-		neckBaseZ.write(30);
+		neckBaseZ.write(22);
 	} else if (robotNumber == 5) {
-		neckBaseZ.write(60);
+		neckBaseZ.write(44);
 	} else if (robotNumber == 6) {
-		neckBaseZ.write(90);
+		neckBaseZ.write(66);
 	} else if (robotNumber == 7) {
-		neckBaseZ.write(120); 
+		neckBaseZ.write(90); 
 	}
 }
 
@@ -485,8 +489,8 @@ void emote(MovementStruct movements, std::vector<std::vector<std::vector<unsigne
 		rightEarServo.write(movements.rightEarAngles[frame % movements.rightEarFrames]);
 		// iterate over every column of the eyes matrices
 		for(int i=0; i < 16; i++) {
-			rightEye.setColumn(i, eyes_animation[(frame % eyes_animation_length)][0][i]);
-			leftEye.setColumn(i, eyes_animation[(frame % eyes_animation_length)][1][i]);
+			rightEye.setColumn(i, eyes_animation[frame % eyes_animation_length][0][i]);
+			leftEye.setColumn(i, eyes_animation[frame % eyes_animation_length][1][i]);
 		}
 		if (!kill_signal) {
 			// delay for the duration of the frame
