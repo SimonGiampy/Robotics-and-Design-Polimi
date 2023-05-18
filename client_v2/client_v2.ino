@@ -485,10 +485,10 @@ void emote(MovementStruct movements, std::vector<std::vector<std::vector<unsigne
 		rightEarServo.write(movements.rightEarAngles[frame % movements.rightEarFrames]);
 		// iterate over every column of the eyes matrices
 		for(int i=0; i < 16; i++) {
-			rightEye.setColumn(i, eyes_animation[frame % eyes_animation_length][0][i]);
-			leftEye.setColumn(i, eyes_animation[frame % eyes_animation_length][1][i]);
+			rightEye.setColumn(i, eyes_animation[(frame % eyes_animation_length)][0][i]);
+			leftEye.setColumn(i, eyes_animation[(frame % eyes_animation_length)][1][i]);
 		}
-		if (!kill) {
+		if (!kill_signal) {
 			// delay for the duration of the frame
 			unsigned long time_now = millis();
 			while (millis() < time_now + 75){
@@ -509,7 +509,7 @@ void emote_happy() {
 }
 
 void emote_sad() {
-	//emote(sadMovements, sad);
+	emote(sadMovements, sad);
 }
 
 void emote_angry() {
