@@ -3,7 +3,7 @@ import threading
 import time
 
 HOST = '0.0.0.0'  # server host
-PORT = 8090  # server port
+PORT = 800  # server port
 
 debug_mode = False
 
