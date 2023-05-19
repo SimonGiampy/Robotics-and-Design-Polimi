@@ -509,7 +509,7 @@ void emote_idle() {
 }
 
 void emote_happy() {
-	//emote(happyMovements, happy);
+  emote(happyMovements, happy);
 }
 
 void emote_sad() {

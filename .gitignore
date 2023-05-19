@@ -38,3 +38,5 @@ eva_robot/.theia/launch.json
 eva_robot/.vscode/arduino.json
 
 eva_robot/.vscode/c_cpp_properties.json
+
+client_v2/.theia/launch.json
