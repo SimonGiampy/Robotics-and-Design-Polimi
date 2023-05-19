@@ -32,7 +32,7 @@ std::string god_message =  "G0";
 std::deque<std::string> messages;
 bool kill_signal = false;
 
-void emote(MovementStruct movements, std::vector<std::vector<std::vector<unsigned int>>> &relaxed );
+void emote(MovementStruct movements, std::vector<std::vector<std::vector<unsigned int>>> &emotion, int audio);
 // emote functions list
 void emote_idle();
 void emote_happy();
@@ -259,22 +259,18 @@ void handle(std::string incomingData) {
 	} else if (incomingData.substr(0, 4) == "play") { // play audio file
 		myDFPlayer.play(std::stoi(incomingData.substr(4, 1)));
 	} else if (incomingData == "happy_") {
-		myDFPlayer.play(4);
 		emote_happy();
 	} else if (incomingData == "angry_") {
-		myDFPlayer.play(3);
 		emote_angry();
+	} else if (incomingData == "annoyed_") {
+		emote_annoyed();
 	} else if (incomingData == "anxious_") {
-		myDFPlayer.play(8);
 		emote_anxious();
 	} else if (incomingData == "sad_") {
-		myDFPlayer.play(7);
 		emote_sad();
 	} else if (incomingData == "surprised_") {
-		myDFPlayer.play(6);
 		emote_surprised();
 	} else if (incomingData == "idle_") {
-		myDFPlayer.play(5);
 		emote_idle();
 	} else if (incomingData == "G1") { // Rocco message
 		lookAt(1);
@@ -476,9 +472,10 @@ void lookAt(int robotNumber) {
 }
 
 
-void emote(MovementStruct movements, std::vector<std::vector<std::vector<unsigned int>>> &eyes_animation) {
+void emote(MovementStruct movements, std::vector<std::vector<std::vector<unsigned int>>> &eyes_animation, int audio) {
 	// compute length of eyes animation
 	int eyes_animation_length = eyes_animation.size();
+	if (audio != 9) myDFPlayer.play(audio);
 
 	//iterate over every frame of the animation
 	for(int frame = 0; frame < movements.maxFrames; frame++){
@@ -487,12 +484,17 @@ void emote(MovementStruct movements, std::vector<std::vector<std::vector<unsigne
 		neckSphereY.write(movements.neckSphereYAngles[frame % movements.neckSphereYFrames]);
 		leftEarServo.write(movements.leftEarAngles[frame % movements.leftEarFrames]);
 		rightEarServo.write(movements.rightEarAngles[frame % movements.rightEarFrames]);
+		leftEyebrowServo.write(movements.leftEyebrowAngles[frame % movements.leftEyebrowFrames]);
+		rightEyebrowServo.write(movements.rightEyebrowAngles[frame % movements.rightEyebrowFrames]);
 		// iterate over every column of the eyes matrices
 		for(int i=0; i < 16; i++) {
 			rightEye.setColumn(i, eyes_animation[frame % eyes_animation_length][0][i]);
 			leftEye.setColumn(i, eyes_animation[frame % eyes_animation_length][1][i]);
 		}
 		if (!kill_signal) {
+			if (frame == movements.maxFrames / 2) {
+				if (audio != 9) myDFPlayer.play(audio);
+			}
 			// delay for the duration of the frame
 			unsigned long time_now = millis();
 			while (millis() < time_now + 75){
@@ -505,31 +507,31 @@ void emote(MovementStruct movements, std::vector<std::vector<std::vector<unsigne
 
 
 void emote_idle() {
-	emote(idleMovements, idle);
+	emote(idleMovements, idle, 9);
 }
 
 void emote_happy() {
-  emote(happyMovements, happy);
+  emote(happyMovements, happy, 4);
 }
 
 void emote_sad() {
-	emote(sadMovements, sad);
+	emote(sadMovements, sad, 5);
 }
 
 void emote_angry() {
-	//emote(angryMovements, angry);
+	//emote(angryMovements, angry, 3);
 }
 
 void emote_surprised() {
-	//emote(surprisedMovements, surprised);
+	//emote(surprisedMovements, surprised, 6);
 }
 
 void emote_annoyed() {
-	//(annoyedMovements, annoyed);
+	//(annoyedMovements, annoyed, 7);
 }
 
 void emote_anxious() {
-	//emote(anxiousMovements, anxious);
+	emote(anxiousMovements, anxious, 8);
 }
 
 
