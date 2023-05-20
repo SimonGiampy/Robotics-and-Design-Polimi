@@ -15,9 +15,9 @@ const char* password_test = "test1234567!";
 const char* server_ip_test = "192.168.1.5";
 int server_port_test = 800;
 
-const char* ssid = "Doki Doki Literature Club";
-const char* password = "SimonGiampy";
-const char* server_ip = "192.168.90.244";
+const char* ssid = "Passione 2.4GHz";
+const char* password = "GiornoGiovanna67";
+const char* server_ip = "192.168.1.100";
 int server_port = 800;
 
 static WiFiClient client;
@@ -33,6 +33,7 @@ std::deque<std::string> messages;
 bool kill_signal = false;
 
 void emote(MovementStruct movements, std::vector<std::vector<std::vector<uint8_t>>> &emotion, int audio);
+void reset_state(); // used to reset to initial angles
 // emote functions list
 void emote_idle();
 void emote_happy();
@@ -47,7 +48,7 @@ void initMouth(){
 	pinMode(PIN_MOUTH_RED,  OUTPUT);
 	pinMode(PIN_MOUTH_GREEN,  OUTPUT);
 	pinMode(PIN_MOUTH_BLUE,  OUTPUT);
-	analogWrite(PIN_MOUTH_RED, 255);
+	analogWrite(PIN_MOUTH_RED, 0);
 	analogWrite(PIN_MOUTH_GREEN, 0);
 	analogWrite(PIN_MOUTH_BLUE, 0);
 }
@@ -256,20 +257,27 @@ void handle(std::string incomingData) {
 		while (millis() - time_now < 3000) {
 			// do nothing
 		}
-	} else if (incomingData.substr(0, 4) == "play") { // play audio file
+		reset_state();
+	} else if (incomingData.substr(0, 4) == "play") { // play audio file for debugging purposes
 		myDFPlayer.play(std::stoi(incomingData.substr(4, 1)));
 	} else if (incomingData == "happy_") {
 		emote_happy();
+		reset_state();
 	} else if (incomingData == "angry_") {
 		emote_angry();
+		reset_state();
 	} else if (incomingData == "annoyed_") {
 		emote_annoyed();
+		reset_state();
 	} else if (incomingData == "anxious_") {
 		emote_anxious();
+		reset_state();
 	} else if (incomingData == "sad_") {
 		emote_sad();
+		reset_state();
 	} else if (incomingData == "surprised_") {
 		emote_surprised();
+		reset_state();
 	} else if (incomingData == "idle_") {
 		emote_idle();
 	} else if (incomingData == "G1") { // Rocco message
@@ -284,26 +292,48 @@ void handle(std::string incomingData) {
 		myDFPlayer.play(2);
 		// send message to server with GG after audio is finished playing
 		while (myDFPlayer.readState() != 0) {
-			// spin wait
+			// blinking mouth when the robot talks
+			setMouthColor(255, 100, 0);
+			unsigned long time_now = millis();
+			while (millis() - time_now < 250) {
+				// do nothing
+			}
+			setMouthColor(0, 0, 0);
+			time_now = millis();
+			while (millis() - time_now < 250) {
+				// do nothing
+			}
 		}
 		client.println("GG");
 		// send message with reaction
 		client.println("2L13");
 		// emote emotion anxoious
 		emote_anxious();
+		reset_state();
 	} else if (incomingData == "G4") { // Eva message
 		god_message = "G4";
 		// read tts message with audio
 		myDFPlayer.play(1);
 		// send message to server with GG after audio is finished playing
 		while (myDFPlayer.readState() != 0) {
-			// spin wait
+			// blinking mouth when the robot talks
+			setMouthColor(255, 100, 0);
+			unsigned long time_now = millis();
+			while (millis() - time_now < 250) {
+				// do nothing
+			}
+			setMouthColor(0, 0, 0);
+			time_now = millis();
+			while (millis() - time_now < 250) {
+				// do nothing
+			}
 		}
 		client.println("GG");
 		// send message with reaction
 		client.println("2C13");
 		// emote emotion angry
 		emote_angry();
+		reset_state();
 	} else if (incomingData == "G5") { // Lele message
 		lookAt(3);
 		god_message = "G5";
@@ -378,6 +408,7 @@ void handle(std::string incomingData) {
 			emote_angry();
 		}
 		god_message == "G0";
+		reset_state();
 	} else if (incomingData.length() == 4) { // reactions of the other robots
 		
 		from = incomingData[0] - '0';
@@ -466,10 +497,8 @@ void handle(std::string incomingData) {
 		// client.print("2A51") // eva is happy towards group 5 at intensity 1
 
 		//client.flush(); // ?
-		
+		reset_state();
 	}
-	//emote_idle(); // after emotion finishes, go back to idle
-
 }
 
 
@@ -498,7 +527,9 @@ void emote(MovementStruct movements, std::vector<std::vector<std::vector<uint8_t
 
 	// if idle, blink the eyes only once in a while
 	// if any other emotion, always play the eyes animation
+	std::srand(std::time(nullptr)); // use current time as seed for random generator
 	if (audio != 9 || (rand() % 300 + 1) == 1) {
+		setMouthColor(255, 0, 0);
 		
 		//iterate over every frame of the animation
 		for(int frame = 0; frame < movements.maxFrames; frame++) {
@@ -538,10 +569,31 @@ void emote(MovementStruct movements, std::vector<std::vector<std::vector<uint8_t
 	}
 }
 
+void reset_state() {
+	// reset the servos to their initial position
+	neckBaseZ.write(NECK_BASE_START_POS);
+	neckSphereX.write(NECK_SPHERE_X_START_POS);
+	neckSphereY.write(NECK_SPHERE_Y_START_POS);
+	leftEarServo.write(LEFT_EAR_START_POS);
+	rightEarServo.write(RIGHT_EAR_START_POS);
+	leftEyebrowServo.write(LEFT_EYEBROW_START_POS);
+	rightEyebrowServo.write(RIGHT_EYEBROW_START_POS);
+	
+	// reset the eyes to their initial position
+	
+	for(int i=0; i < 16; i++) {
+		// iterate over every column of the eyes matrices
+		rightEye.setColumn(i, idle[0][0][i]);
+		leftEye.setColumn(i, idle[0][1][i]);
+	}
 
+	setMouthColor(0, 0, 0);
+
+}
 
 void emote_idle() {
 	emote(idleMovements, idle, 9);
+	setMouthColor(0, 0, 0);
 }
 
 void emote_happy() {
