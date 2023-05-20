@@ -519,11 +519,11 @@ void emote_sad() {
 }
 
 void emote_angry() {
-	//emote(angryMovements, angry, 3);
+	emote(angryMovements, angry, 3);
 }
 
 void emote_surprised() {
-	//emote(surprisedMovements, surprised, 6);
+	emote(surprisedMovements, surprised, 6);
 }
 
 void emote_annoyed() {
