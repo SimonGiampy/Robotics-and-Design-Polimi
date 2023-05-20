@@ -341,28 +341,40 @@ void handle(std::string incomingData) {
 		emote_idle();
 	} else if (incomingData == "GG") { // react to the God messages
 		if (god_message == "G1") {
+			client.println("2B13");
 			emote_happy();
 		} else if (god_message == "G2") {
+			client.println("2C13");
 			emote_angry();
 		} else if (god_message == "G5") {
-			emote_happy();
+			client.println("2I33");
+			emote_surprised();
 		} else if (god_message == "G6") {
-			emote_angry();
-		} else if (god_message == "G7") {
+			client.println("2B33");
 			emote_happy();
+		} else if (god_message == "G7") {
+			client.println("2I43");
+			emote_surprised();
 		} else if (god_message == "G8") {
+			client.println("2C43");
 			emote_angry();
 		} else if (god_message == "G9") {
+			client.println("2B53");
 			emote_happy();
 		} else if (god_message == "GA") {
+			client.println("2C53");
 			emote_angry();
 		} else if (god_message == "GB") {
-			emote_happy();
+			client.println("2I63");
+			emote_surprised();
 		} else if (god_message == "GC") {
-			emote_angry();
-		} else if (god_message == "GD") {
+			client.println("2C63");
 			emote_happy();
+		} else if (god_message == "GD") {
+			client.println("2L73");
+			emote_anxious();
 		} else if (god_message == "GE") {
+			client.println("2C73");
 			emote_angry();
 		}
 		god_message == "G0";
@@ -392,6 +404,8 @@ void handle(std::string incomingData) {
 				emote_surprised();
 			} else if (emotion == 'E') { // sad
 				emote_sad();
+			} else if (emotion == 'K') { // embarassed
+				emote_annoyed();
 			}
 
 		} else if (from == 3) {
@@ -420,6 +434,8 @@ void handle(std::string incomingData) {
 				emote_surprised();
 			} else if (emotion == 'B') { // happy
 				emote_happy();
+			} else if (emotion == 'K') { // embarrassed
+				emote_happy();
 			}
 		} else if (from == 6) {
  			if (emotion == 'E') { // sad
@@ -428,12 +444,15 @@ void handle(std::string incomingData) {
 				emote_happy();
 			} else if (emotion == 'D') { // shocked
 				emote_sad();
+			} else if (emotion == 'K') { // embarrassed
+				emote_anxious();
+
 			}
 		} else if (from == 7) {
 			if (emotion == 'H') { // cautious
 				emote_annoyed();
 			} else if (emotion == 'G') { // afraid
-				emote_surprised();
+				emote_annoyed();
 			} else if (emotion == 'E') { // sad
 				emote_sad();
 			} else if (emotion == 'B') { // happy
@@ -475,35 +494,50 @@ void lookAt(int robotNumber) {
 void emote(MovementStruct movements, std::vector<std::vector<std::vector<uint8_t>>> &eyes_animation, int audio) {
 	// compute length of eyes animation
 	int eyes_animation_length = eyes_animation.size();
-	if (audio != 9) myDFPlayer.play(audio);
+	if (audio != 9) myDFPlayer.play(audio); // idle audio doesn't play
 
-	//iterate over every frame of the animation
-	for(int frame = 0; frame < movements.maxFrames; frame++){
-		neckBaseZ.write(movements.neckBaseAngles[frame % movements.neckBaseFrames]);
-		neckSphereX.write(movements.neckSphereXAngles[frame % movements.neckSphereXFrames]);
-		neckSphereY.write(movements.neckSphereYAngles[frame % movements.neckSphereYFrames]);
-		leftEarServo.write(movements.leftEarAngles[frame % movements.leftEarFrames]);
-		rightEarServo.write(movements.rightEarAngles[frame % movements.rightEarFrames]);
-		leftEyebrowServo.write(movements.leftEyebrowAngles[frame % movements.leftEyebrowFrames]);
-		rightEyebrowServo.write(movements.rightEyebrowAngles[frame % movements.rightEyebrowFrames]);
-		// iterate over every column of the eyes matrices
-		for(int i=0; i < 16; i++) {
-			rightEye.setColumn(i, eyes_animation[frame % eyes_animation_length][0][i]);
-			leftEye.setColumn(i, eyes_animation[frame % eyes_animation_length][1][i]);
+	// if idle, blink the eyes only once in a while
+	// if any other emotion, always play the eyes animation
+	if (audio != 9 || (rand() % 300 + 1) == 1) {
+		
+		//iterate over every frame of the animation
+		for(int frame = 0; frame < movements.maxFrames; frame++) {
+			// apply the movements to the servos
+			neckBaseZ.write(movements.neckBaseAngles[frame % movements.neckBaseFrames]);
+			neckSphereX.write(movements.neckSphereXAngles[frame % movements.neckSphereXFrames]);
+			neckSphereY.write(movements.neckSphereYAngles[frame % movements.neckSphereYFrames]);
+			leftEarServo.write(movements.leftEarAngles[frame % movements.leftEarFrames]);
+			rightEarServo.write(movements.rightEarAngles[frame % movements.rightEarFrames]);
+			leftEyebrowServo.write(movements.leftEyebrowAngles[frame % movements.leftEyebrowFrames]);
+			rightEyebrowServo.write(movements.rightEyebrowAngles[frame % movements.rightEyebrowFrames]);
+			
+			
+			for(int i=0; i < 16; i++) {
+				// iterate over every column of the eyes matrices
+				rightEye.setColumn(i, eyes_animation[frame % eyes_animation_length][0][i]);
+				leftEye.setColumn(i, eyes_animation[frame % eyes_animation_length][1][i]);
+			}
+		
+			
+			if (!kill_signal) {
+				if (frame == movements.maxFrames / 2) { // at half of the animation, replays the audio
+					if (audio != 9) myDFPlayer.play(audio); // idle audio doesn't play
+				}
+				// delay for the duration of the frame
+				unsigned long time_now = millis();
+				while (millis() < time_now + 75){
+				}
+			} else return; // if GF signal is received, stop the animation
 		}
-		if (!kill_signal) {
-			if (frame == movements.maxFrames / 2) {
-				if (audio != 9) myDFPlayer.play(audio);
-			}
-			// delay for the duration of the frame
-			unsigned long time_now = millis();
-			while (millis() < time_now + 75){
-				//wait approx. 100 ms
-			}
-		} else return;
+	} else {
+		// if it skips idle animation, then wait for 75ms anyway
+		// delay for the duration of the frame
+		unsigned long time_now = millis();
+		while (millis() < time_now + 75){
+		}
 	}
-
 }
+
 
 
 void emote_idle() {
