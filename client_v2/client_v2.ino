@@ -32,7 +32,7 @@ std::string god_message =  "G0";
 std::deque<std::string> messages;
 bool kill_signal = false;
 
-void emote(MovementStruct movements, std::vector<std::vector<std::vector<unsigned int>>> &emotion, int audio);
+void emote(MovementStruct movements, std::vector<std::vector<std::vector<uint8_t>>> &emotion, int audio);
 // emote functions list
 void emote_idle();
 void emote_happy();
@@ -472,7 +472,7 @@ void lookAt(int robotNumber) {
 }
 
 
-void emote(MovementStruct movements, std::vector<std::vector<std::vector<unsigned int>>> &eyes_animation, int audio) {
+void emote(MovementStruct movements, std::vector<std::vector<std::vector<uint8_t>>> &eyes_animation, int audio) {
 	// compute length of eyes animation
 	int eyes_animation_length = eyes_animation.size();
 	if (audio != 9) myDFPlayer.play(audio);
