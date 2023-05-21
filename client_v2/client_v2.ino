@@ -425,70 +425,96 @@ void handle(std::string incomingData) {
 		if (from == 1) {
 			if (emotion == 'C' || emotion == 'J') {// angry or annoyed
 				if (to == 2) {
+					client.print("2I13");
 					emote_surprised(1);
 				} else {
+					client.print("2C11");
 					emote_angry(1);
 				}
 			} else if (emotion == 'B') { // happy
+				client.print("2B13");
 				emote_happy(1);
 			} else if (emotion == 'G') { // afraid
+				client.print("2I13");
 				emote_surprised(1);
 			} else if (emotion == 'E') { // sad
+				client.print("2E13");
 				emote_sad(1);
 			} else if (emotion == 'K') { // embarassed
+				client.print("2J13");
 				emote_annoyed(1);
 			}
 
 		} else if (from == 3) {
 			if (emotion == 'C') { // angry
+				client.print("2J33");
 				emote_annoyed(3);
 			} else if (emotion == 'H') { // cautious
+				client.print("2C33");
 				emote_angry(3);
 			} else if (emotion == 'D') { // shocked
+				client.print("2I33");
 				emote_surprised(3);
 			}
 			
 		} else if (from == 4) {
 			if (emotion == 'D') { // shocked
+				client.print("2I43");
 				emote_surprised(4);
 			} else if (emotion == 'C') { // angry
+				client.print("2C43");
 				emote_angry(4);
 			} else if (emotion == 'L') { // anxious
+				client.print("2L43");
 				emote_anxious(4);
 			} else if (emotion == 'G') { // afraid
+				client.print("2E43");
 				emote_sad(4);
 			}
 		} else if (from == 5) {
 			if (emotion == 'C') { // angry
+				client.print("2B53");
 				emote_happy(5);
 			} else if (emotion == 'H') { // cautious
+				client.print("2I53");
 				emote_surprised(5);
 			} else if (emotion == 'B') { // happy
+				client.print("2B53");
 				emote_happy(5);
 			} else if (emotion == 'K') { // embarrassed
+				client.print("2B53");
 				emote_happy(5);
 			}
 		} else if (from == 6) {
  			if (emotion == 'E') { // sad
+				client.print("2E63");
 				emote_sad(6);
 			} else if (emotion == 'B') { // happy
+				client.print("2B63");
 				emote_happy(6);
 			} else if (emotion == 'D') { // shocked
+				client.print("2E63");
 				emote_sad(6);
 			} else if (emotion == 'K') { // embarrassed
+				client.print("2L63");
 				emote_anxious(6);
 
 			}
 		} else if (from == 7) {
 			if (emotion == 'H') { // cautious
+				client.print("2J73");
 				emote_annoyed(7);
 			} else if (emotion == 'G') { // afraid
+				client.print("2J73");
 				emote_annoyed(7);
 			} else if (emotion == 'E') { // sad
+				client.print("2E73");
 				emote_sad(7);
 			} else if (emotion == 'B') { // happy
+				client.print("2B73");
 				emote_happy(7);
 			} else if (emotion == 'D') { // shocked
+				client.print("2E73");
 				emote_sad(7);
 			}
 		}
@@ -532,7 +558,6 @@ void emote(MovementStruct movements, std::vector<std::vector<std::vector<uint8_t
 
 	// if idle, blink the eyes only once in a while
 	// if any other emotion, always play the eyes animation
-	std::srand(std::time(nullptr)); // use current time as seed for random generator
 	if (audio != 9 || (rand() % 300 + 1) == 1) {
 		setMouthColor(255, 0, 0);
 		
@@ -548,7 +573,7 @@ void emote(MovementStruct movements, std::vector<std::vector<std::vector<uint8_t
 
 
 			// neck base rotation on z axis needs to be adjusted relative to the robot towards which the robot is looking
-			if (audio != 5 && audio != 8) { //if it's not sad or anxious emotion:
+			if (audio != 5 && audio != 8 && audio != 9) { //if it's not sad or anxious emotion:
 				neckBaseZ.write(movements.neckBaseAngles[frame % movements.neckBaseFrames] - 90 + getAngle(lookAtRobot));
 			} else if (audio == 8 || audio == 9) { // anxious emotion or in idle
 				neckBaseZ.write(movements.neckBaseAngles[frame % movements.neckBaseFrames]);
@@ -633,7 +658,7 @@ void emote_surprised(int lookAtRobot) {
 }
 
 void emote_annoyed(int lookAtRobot) {
-	//(annoyedMovements, annoyed, 7, lookAtRobot);
+	emote(annoyedMovements, annoyed, 7, lookAtRobot);
 }
 
 void emote_anxious(int lookAtRobot) {
