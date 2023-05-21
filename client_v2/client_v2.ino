@@ -183,7 +183,7 @@ void network_loop(void* pvParameters) {
 		}
 
 		if (client.available()) {
-			incomingData = std::string(client.readString().c_str());
+			incomingData = std::string(client.readStringUntil('\n').c_str());
 			Serial.print("Server says: ");
 			Serial.println(incomingData.c_str());
 
@@ -260,23 +260,23 @@ void handle(std::string incomingData) {
 		reset_state();
 	} else if (incomingData.substr(0, 4) == "play") { // play audio file for debugging purposes
 		myDFPlayer.play(std::stoi(incomingData.substr(4, 1)));
-	} else if (incomingData == "happy_") {
-		emote_happy(7);
+	} else if (incomingData.substr(0, 6) == "happy_") {
+		emote_happy(std::stoi(incomingData.substr(6, 1)));
 		reset_state();
-	} else if (incomingData == "angry_") {
-		emote_angry(7);
+	} else if (incomingData.substr(0, 6) == "angry_") {
+		emote_angry(std::stoi(incomingData.substr(6, 1)));
 		reset_state();
-	} else if (incomingData == "annoyed_") {
-		emote_annoyed(7);
+	} else if (incomingData.substr(0, 8) == "annoyed_") {
+		emote_annoyed(std::stoi(incomingData.substr(8, 1)));
 		reset_state();
-	} else if (incomingData == "anxious_") {
-		emote_anxious(7);
+	} else if (incomingData.substr(0, 8) == "anxious_") {
+		emote_anxious(std::stoi(incomingData.substr(8, 1)));
 		reset_state();
-	} else if (incomingData == "sad_") {
-		emote_sad(7);
+	} else if (incomingData.substr(0, 4) == "sad_") {
+		emote_sad(std::stoi(incomingData.substr(4, 1)));
 		reset_state();
-	} else if (incomingData == "surprised_") {
-		emote_surprised(7);
+	} else if (incomingData.substr(0, 10) == "surprised_") {
+		emote_surprised(std::stoi(incomingData.substr(10, 1)));
 		reset_state();
 	} else if (incomingData == "idle_") {
 		emote_idle();
@@ -304,9 +304,9 @@ void handle(std::string incomingData) {
 				// do nothing
 			}
 		}
-		client.print("GG\n");
+		client.print("GG");
 		// send message with reaction
-		client.print("2L13\n");
+		client.print("2L13");
 		// emote emotion anxoious
 		emote_anxious(1);
 		reset_state();
@@ -328,9 +328,9 @@ void handle(std::string incomingData) {
 				// do nothing
 			}
 		}
-		client.print("GG\n");
+		client.print("GG");
 		// send message with reaction
-		client.print("2C13\n");
+		client.print("2C13");
 		// emote emotion angry
 		emote_angry(1);
 		reset_state();
@@ -371,40 +371,40 @@ void handle(std::string incomingData) {
 		emote_idle();
 	} else if (incomingData == "GG") { // react to the God messages
 		if (god_message == "G1") {
-			client.print("2B13\n");
+			client.print("2B13");
 			emote_happy(1);
 		} else if (god_message == "G2") {
-			client.print("2C13\n");
+			client.print("2C13");
 			emote_angry(1);
 		} else if (god_message == "G5") {
-			client.print("2I33\n");
+			client.print("2I33");
 			emote_surprised(3);
 		} else if (god_message == "G6") {
-			client.print("2B33\n");
+			client.print("2B33");
 			emote_happy(3);
 		} else if (god_message == "G7") {
-			client.print("2I43\n");
+			client.print("2I43");
 			emote_surprised(4);
 		} else if (god_message == "G8") {
-			client.print("2C43\n");
+			client.print("2C43");
 			emote_angry(4);
 		} else if (god_message == "G9") {
-			client.print("2B53\n");
+			client.print("2B53");
 			emote_happy(5);
 		} else if (god_message == "GA") {
-			client.print("2C53\n");
+			client.print("2C53");
 			emote_angry(5);
 		} else if (god_message == "GB") {
-			client.print("2I63\n");
+			client.print("2I63");
 			emote_surprised(6);
 		} else if (god_message == "GC") {
-			client.print("2C63\n");
+			client.print("2C63");
 			emote_happy(6);
 		} else if (god_message == "GD") {
-			client.print("2L73\n");
+			client.print("2L73");
 			emote_anxious(7);
 		} else if (god_message == "GE") {
-			client.print("2E73\n");
+			client.print("2E73");
 			emote_sad(7);
 		}
 		god_message == "G0";
