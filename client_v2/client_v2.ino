@@ -13,10 +13,10 @@ const char* password_test = "test1234567!";
 const char* server_ip_test = "192.168.1.5";
 int server_port_test = 800;
 
-const char* ssid = "Passione 2.4GHz";
-const char* password = "GiornoGiovanna67";
-const char* server_ip = "192.168.1.100";
-int server_port = 800;
+const char* ssid = "Triskarone";
+const char* password = "triskarone";
+const char* server_ip = "192.168.1.101";
+int server_port = 8090;
 
 static WiFiClient client;
 
@@ -110,7 +110,7 @@ void initSpeaker() {
 
 	int mp3Count = myDFPlayer.readFileCounts();
 	Serial.print("mp3 files count: " + String(mp3Count));
-	myDFPlayer.volume(20);
+	myDFPlayer.volume(30);
 	myDFPlayer.EQ(DFPLAYER_EQ_NORMAL);
 	myDFPlayer.outputDevice(DFPLAYER_DEVICE_SD);
 
@@ -304,9 +304,9 @@ void handle(std::string incomingData) {
 				// do nothing
 			}
 		}
-		client.print("GG");
+		client.print("GG\n");
 		// send message with reaction
-		client.print("2L13");
+		client.print("2L13\n");
 		// emote emotion anxoious
 		emote_anxious(1);
 		reset_state();
@@ -328,9 +328,9 @@ void handle(std::string incomingData) {
 				// do nothing
 			}
 		}
-		client.print("GG");
+		client.print("GG\n");
 		// send message with reaction
-		client.print("2C13");
+		client.print("2C13\n");
 		// emote emotion angry
 		emote_angry(1);
 		reset_state();
@@ -371,40 +371,40 @@ void handle(std::string incomingData) {
 		emote_idle();
 	} else if (incomingData == "GG") { // react to the God messages
 		if (god_message == "G1") {
-			client.print("2B13");
+			client.print("2B13\n");
 			emote_happy(1);
 		} else if (god_message == "G2") {
-			client.print("2C13");
+			client.print("2C13\n");
 			emote_angry(1);
 		} else if (god_message == "G5") {
-			client.print("2I33");
+			client.print("2I33\n");
 			emote_surprised(3);
 		} else if (god_message == "G6") {
-			client.print("2B33");
+			client.print("2B33\n");
 			emote_happy(3);
 		} else if (god_message == "G7") {
-			client.print("2I43");
+			client.print("2I43\n");
 			emote_surprised(4);
 		} else if (god_message == "G8") {
-			client.print("2C43");
+			client.print("2C43\n");
 			emote_angry(4);
 		} else if (god_message == "G9") {
-			client.print("2B53");
+			client.print("2B53\n");
 			emote_happy(5);
 		} else if (god_message == "GA") {
-			client.print("2C53");
+			client.print("2C53\n");
 			emote_angry(5);
 		} else if (god_message == "GB") {
-			client.print("2I63");
+			client.print("2I63\n");
 			emote_surprised(6);
 		} else if (god_message == "GC") {
-			client.print("2C63");
+			client.print("2C63\n");
 			emote_happy(6);
 		} else if (god_message == "GD") {
-			client.print("2L73");
+			client.print("2L73\n");
 			emote_anxious(7);
 		} else if (god_message == "GE") {
-			client.print("2E73");
+			client.print("2E73\n");
 			emote_sad(7);
 		}
 		god_message == "G0";
@@ -425,96 +425,96 @@ void handle(std::string incomingData) {
 		if (from == 1) {
 			if (emotion == 'C' || emotion == 'J') {// angry or annoyed
 				if (to == 2) {
-					client.print("2I13");
+					client.print("2I13\n");
 					emote_surprised(1);
 				} else {
-					client.print("2C11");
+					client.print("2C11\n");
 					emote_angry(1);
 				}
 			} else if (emotion == 'B') { // happy
-				client.print("2B13");
+				client.print("2B13\n");
 				emote_happy(1);
 			} else if (emotion == 'G') { // afraid
-				client.print("2I13");
+				client.print("2I13\n");
 				emote_surprised(1);
 			} else if (emotion == 'E') { // sad
-				client.print("2E13");
+				client.print("2E13\n");
 				emote_sad(1);
 			} else if (emotion == 'K') { // embarassed
-				client.print("2J13");
+				client.print("2J13\n");
 				emote_annoyed(1);
 			}
 
 		} else if (from == 3) {
 			if (emotion == 'C') { // angry
-				client.print("2J33");
+				client.print("2J33\n");
 				emote_annoyed(3);
 			} else if (emotion == 'H') { // cautious
-				client.print("2C33");
+				client.print("2C33\n");
 				emote_angry(3);
 			} else if (emotion == 'D') { // shocked
-				client.print("2I33");
+				client.print("2I33\n");
 				emote_surprised(3);
 			}
 			
 		} else if (from == 4) {
 			if (emotion == 'D') { // shocked
-				client.print("2I43");
+				client.print("2I43\n");
 				emote_surprised(4);
 			} else if (emotion == 'C') { // angry
-				client.print("2C43");
+				client.print("2C43\n");
 				emote_angry(4);
 			} else if (emotion == 'L') { // anxious
-				client.print("2L43");
+				client.print("2L43\n");
 				emote_anxious(4);
 			} else if (emotion == 'G') { // afraid
-				client.print("2E43");
+				client.print("2E43\n");
 				emote_sad(4);
 			}
 		} else if (from == 5) {
 			if (emotion == 'C') { // angry
-				client.print("2B53");
+				client.print("2B53\n");
 				emote_happy(5);
 			} else if (emotion == 'H') { // cautious
-				client.print("2I53");
+				client.print("2I53\n");
 				emote_surprised(5);
 			} else if (emotion == 'B') { // happy
-				client.print("2B53");
+				client.print("2B53\n");
 				emote_happy(5);
 			} else if (emotion == 'K') { // embarrassed
-				client.print("2B53");
+				client.print("2B53\n");
 				emote_happy(5);
 			}
 		} else if (from == 6) {
  			if (emotion == 'E') { // sad
-				client.print("2E63");
+				client.print("2E63\n");
 				emote_sad(6);
 			} else if (emotion == 'B') { // happy
-				client.print("2B63");
+				client.print("2B63\n");
 				emote_happy(6);
 			} else if (emotion == 'D') { // shocked
-				client.print("2E63");
+				client.print("2E63\n");
 				emote_sad(6);
 			} else if (emotion == 'K') { // embarrassed
-				client.print("2L63");
+				client.print("2L63\n");
 				emote_anxious(6);
 
 			}
 		} else if (from == 7) {
 			if (emotion == 'H') { // cautious
-				client.print("2J73");
+				client.print("2J73\n");
 				emote_annoyed(7);
 			} else if (emotion == 'G') { // afraid
-				client.print("2J73");
+				client.print("2J73\n");
 				emote_annoyed(7);
 			} else if (emotion == 'E') { // sad
-				client.print("2E73");
+				client.print("2E73\n");
 				emote_sad(7);
 			} else if (emotion == 'B') { // happy
-				client.print("2B73");
+				client.print("2B73\n");
 				emote_happy(7);
 			} else if (emotion == 'D') { // shocked
-				client.print("2E73");
+				client.print("2E73\n");
 				emote_sad(7);
 			}
 		}

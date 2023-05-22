@@ -3,8 +3,8 @@
 
 // wirings:
 // https://github.com/NicolasBrondin/flower-player/raw/master/schema.jpg
-// tx pin mp3 -> gpio 17 esp32
-// rx pin mp3 -> gpio 16 esp32
+// tx pin mp3 -> gpio 15 esp32
+// rx pin mp3 -> gpio 5 esp32
 // from left to right, with mp3 player sd card side on the left, on the top:
 // spk2 mp3 -> speaker negative
 // gnd mp3 -> gnd

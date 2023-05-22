@@ -7,36 +7,35 @@
  */
 
 #include <ESP32Servo.h>
+#include <string>
 
 Servo servo_left, servo_right;
 
 void setup() {
+	Serial.begin(115200);
 	servo_left.attach(19);  // attaches the servo on ESP32 pin
 	servo_right.attach(18);  // attaches the servo on ESP32 pin
 
 	// right servo motor goes from standing position at 150 degrees down to 80 degrees (pulling position)
 	// left servo motor goes from standing position at 80 degrees up to 150 degrees (pulling position)
-	
-	servo_left.write(100);
-	servo_right.write(100);
 	delay(1000);
 }
 
 
 void loop() {
 	
-	for (int i = 80; i < 150; i++) {
-		servo_left.write(i);
-		delay(30);
+	// read string from serial monitor
+	std::string input = "";
+	while (Serial.available()) {
+		input = std::string(Serial.readString().c_str());
+		if (input[0] == 'l') {
+			// left: up from 160, down at 95 degrees
+			servo_left.write(std::stoi(input.substr(1, 3)));
+		} else if (input[0] == 'r') {
+			// right: up from 90 degrees, down at 160 degrees
+			servo_right.write(std::stoi(input.substr(1, 3)));
+		}
+		delay(10);
 	}
-
-	//delay(1000);
-	
-	for (int i = 150; i > 80; i--) {
-		servo_right.write(i);
-		delay(30);
-	}
-
-	//delay(1000);
 	
 }
